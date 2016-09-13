@@ -10,7 +10,7 @@ var PORT = 3000;
 var DB_URL = 'mongodb://localhost/moviedb';
 var MOVIE_DB_URL = 'https://api.themoviedb.org/3';
 var MOVIE_DB_KEY = process.env.MOVIE_DB_KEY;
-var FACEBOOK_APP_TOKEN = process.end.FACEBOOK_APP_TOKEN;
+var FACEBOOK_APP_TOKEN = process.env.FACEBOOK_APP_TOKEN;
 
 //Enable CORS
 app.use(cors());
