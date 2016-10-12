@@ -9,10 +9,13 @@ import fetch from 'node-fetch';
 const app = express()
 
 const PORT               = process.env.PORT || 3001;
+const TIMEOUT            = process.env.TIMEOUT || 3000;
 const DB_URL             = process.env.DB_URL;
 const MOVIE_DB_URL       = process.env.MOVIE_DB_URL;
 const MOVIE_DB_KEY       = process.env.MOVIE_DB_KEY;
 const FACEBOOK_APP_TOKEN = process.env.FACEBOOK_APP_TOKEN;
+
+let moviedbImageURL = 'http://image.tmdb.org/t/p/'; //Should be getting this on start every few days
 
 app.use(cors());
 
@@ -37,7 +40,7 @@ app.get('/api/verifyFacebook', function(req, res) {
   fetch('https://graph.facebook.com/debug_token?input_token=' + accessToken +'&access_token=' + FACEBOOK_APP_TOKEN,
     {
       method: 'GET',
-      timeout: 3000,
+      timeout: TIMEOUT,
     }
   )
   .then((response) => {
@@ -69,31 +72,43 @@ app.get('/movieapi', function(req, res) {
   //If no path is defined, request is malformed
   if(!path) {
     res.json({
-      error: true,
       status: 400,
-    })
-  }
-
-  function callback(error, response, body) {
-    if(!error && response.statusCode == 200) {
-      res.json(body);
-    } else {
-      res.json({
-        error: true,
-        status: response.statusCode,
-      });
-    }
+      error: 'Bad Request.',
+    });
   }
 
   function correctSymbol(path) { return (path.includes('?')) ? '&' : '?'; }
 
-  fetch(
-    {
-      url: MOVIE_DB_URL + path + correctSymbol(path) + 'api_key=' + MOVIE_DB_KEY,
-      method: 'GET',
-    },
-    callback
-  );
+  fetch(MOVIE_DB_URL + path + correctSymbol(path) + 'api_key=' + MOVIE_DB_KEY,
+  {
+    method: 'GET',
+    timeout: TIMEOUT,
+  })
+  .then((response) => {
+    if(response.status == 200) {
+      return response.json();
+    } else {
+      res.json({
+        status: 503,
+        error: 'Cannot reach MovieDB API.'
+      });
+    }
+  })
+  .then((response) => {
+    res.json(response);
+  })
+  .catch((error) => {
+    res.json({
+      status: 503,
+      error: 'Cannot reach MovieDB API.',
+    });
+  });
+});
+
+app.get('/configuration', function(req, res) {
+  res.json({
+    base_url: moviedbImageURL,
+  });
 });
 
 
