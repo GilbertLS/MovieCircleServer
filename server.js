@@ -46,11 +46,11 @@ app.get('/api/login', authRoutes.login);
 app.post('/api/user/:userId/favorite/:movieId', userRoutes.postFavorite);
 app.delete('/api/user/:userId/favorite/:movieId', userRoutes.deleteFavorite);
 //app.get('/api/user/:userId/favorite', userRoutes.getFavorites);
-//app.post('/api/user/:userId/watched/:movieId', userRoutes.postWatched);
-//app.delete('/api/user/:userId/watched/:movieId', userRoutes.deleteWatched);
+app.post('/api/user/:userId/watched/:movieId', userRoutes.postWatched);
+app.delete('/api/user/:userId/watched/:movieId', userRoutes.deleteWatched);
 //app.get('/api/user/:userId/watched', userRoutes.getWatched);
-//app.post('/api/user/:userId/watchlater/:movieId', userRoutes.postWatchLater);
-//app.delete('/api/user/:userId/watchlater/:movieId', userRoutes.deleteWatchLater);
+app.post('/api/user/:userId/watchlater/:movieId', userRoutes.postWatchLater);
+app.delete('/api/user/:userId/watchlater/:movieId', userRoutes.deleteWatchLater);
 //app.get('/api/user/:userId/watchLater', userRoutes.getWatchLater);
 
 app.get('/movieapi', tmdbRoutes.getData);

@@ -3,6 +3,7 @@ import {
   User,
   Favorite,
   Watched,
+  WatchLater,
 }  from '../models'
 
 const MONGO_DUPLICATE = 11000;
