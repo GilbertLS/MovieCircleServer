@@ -69,7 +69,7 @@ function login(facebookData, accessToken, res) {
 }
 
 function createUser(facebookData, accessToken) {
-  var newUser = new User({
+  const newUser = new User({
     facebookId: facebookData.user_id,
     accessToken: {
       token: accessToken,

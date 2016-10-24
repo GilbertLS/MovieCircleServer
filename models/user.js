@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = Schema({
   facebookId: {type: String, required: true, unique: true},
-  accessToken: {type: Object},
+  accessToken: {type: Object, required: true},
   friends: {type: Array}
 });
 

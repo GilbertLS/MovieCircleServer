@@ -34,6 +34,7 @@ app.use(morgan('dev'));
 import routes from './routes';
 const tmdbRoutes = routes.tmdb(TMDB_URL, TMDB_KEY, TIMEOUT);
 const authRoutes = routes.auth(FACEBOOK_APP_TOKEN, TIMEOUT);
+const userRoutes = routes.user(TIMEOUT);
 
 //API Routes
 app.get('/', function(req, res) {
@@ -41,6 +42,17 @@ app.get('/', function(req, res) {
 });
 
 app.get('/api/login', authRoutes.login);
+
+app.post('/api/user/:userId/favorite/:movieId', userRoutes.postFavorite);
+app.delete('/api/user/:userId/favorite/:movieId', userRoutes.deleteFavorite);
+//app.get('/api/user/:userId/favorite', userRoutes.getFavorites);
+//app.post('/api/user/:userId/watched/:movieId', userRoutes.postWatched);
+//app.delete('/api/user/:userId/watched/:movieId', userRoutes.deleteWatched);
+//app.get('/api/user/:userId/watched', userRoutes.getWatched);
+//app.post('/api/user/:userId/watchlater/:movieId', userRoutes.postWatchLater);
+//app.delete('/api/user/:userId/watchlater/:movieId', userRoutes.deleteWatchLater);
+//app.get('/api/user/:userId/watchLater', userRoutes.getWatchLater);
+
 app.get('/movieapi', tmdbRoutes.getData);
 
 app.get('/configuration', function(req, res) {
