@@ -8,7 +8,7 @@ import {
 
 const MONGO_DUPLICATE = 11000;
 
-export default function(timeout) {
+export default function() {
   return {
     postFavorite: function(req, res) {
       const accessToken = req.get('Authorization');
@@ -92,6 +92,7 @@ const getAuthorizedUser = function(accessToken, userId) {
   }
 };
 
+//This should only be used with Favorite, Watched, WatchLater
 const addDocument = function(accessToken, userId, movieId, Model) {
   return getAuthorizedUser(accessToken, userId)
   .then((user) => {
@@ -123,6 +124,7 @@ const addDocument = function(accessToken, userId, movieId, Model) {
   });
 };
 
+//This should only be used with Favorite, Watched, WatchLater
 const deleteDocument = function(accessToken, userId, movieId, Model) {
   return getAuthorizedUser(accessToken, userId)
   .then((user) => {

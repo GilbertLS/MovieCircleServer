@@ -34,15 +34,17 @@ app.use(morgan('dev'));
 import routes from './routes';
 const tmdbRoutes = routes.tmdb(TMDB_URL, TMDB_KEY, TIMEOUT);
 const authRoutes = routes.auth(FACEBOOK_APP_TOKEN, TIMEOUT);
-const userRoutes = routes.user(TIMEOUT);
+const userRoutes = routes.user();
 
 //API Routes
 app.get('/', function(req, res) {
   res.send('MovieCircle API');
 });
 
+//Auth routes
 app.get('/api/login', authRoutes.login);
 
+//User routes
 app.post('/api/user/:userId/favorite/:movieId', userRoutes.postFavorite);
 app.delete('/api/user/:userId/favorite/:movieId', userRoutes.deleteFavorite);
 //app.get('/api/user/:userId/favorite', userRoutes.getFavorites);
@@ -53,7 +55,13 @@ app.post('/api/user/:userId/watchlater/:movieId', userRoutes.postWatchLater);
 app.delete('/api/user/:userId/watchlater/:movieId', userRoutes.deleteWatchLater);
 //app.get('/api/user/:userId/watchLater', userRoutes.getWatchLater);
 
-app.get('/movieapi', tmdbRoutes.getData);
+//Movie routes
+app.get('/api/movie/:movieId', tmdbRoutes.getMovieInfo);
+app.get('/api/movie/popular/:page', tmdbRoutes.getPopular);
+app.get('/api/movie/top_rated/:page', tmdbRoutes.getTopRated);
+app.get('/api/movie/now_playing/:page', tmdbRoutes.getNowPlaying);
+app.get('/api/movie/upcoming/:page', tmdbRoutes.getUpcoming);
+app.get('/api/search/:query/:page', tmdbRoutes.search);
 
 app.get('/configuration', function(req, res) {
   res.json({
