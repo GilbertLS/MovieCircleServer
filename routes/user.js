@@ -4,11 +4,12 @@ import {
   Favorite,
   Watched,
   WatchLater,
+  Movie,
 }  from '../models'
 
 const MONGO_DUPLICATE = 11000;
 
-export default function() {
+export default function(pageSize) {
   return {
     postFavorite: function(req, res) {
       const accessToken = req.get('Authorization');
@@ -30,6 +31,20 @@ export default function() {
         res.sendStatus(status);
       });
     },
+    getFavorite: function(req, res) {
+      const accessToken = req.get('Authorization');
+      const userId = req.params.userId;
+      const page = req.params.page;
+
+      getPaginatedDocuments(accessToken, userId, page, Favorite, pageSize)
+      .then((result) => {
+        if(typeof result === 'number') {
+          res.sendStatus(result);
+        } else {
+          res.json(result);
+        }
+      })
+    },
     postWatched: function(req, res) {
       const accessToken = req.get('Authorization');
       const userId = req.params.userId;
@@ -49,6 +64,20 @@ export default function() {
       .then((status) => {
         res.sendStatus(status);
       });
+    },
+    getWatched: function(req, res) {
+      const accessToken = req.get('Authorization');
+      const userId = req.params.userId;
+      const page = req.params.page;
+
+      getPaginatedDocuments(accessToken, userId, page, Watched, pageSize)
+      .then((result) => {
+        if(typeof result === 'number') {
+          res.sendStatus(result);
+        } else {
+          res.json(result);
+        }
+      })
     },
     postWatchLater: function(req, res) {
       const accessToken = req.get('Authorization');
@@ -70,6 +99,20 @@ export default function() {
         res.sendStatus(status);
       });
     },
+    getWatchLater: function(req, res) {
+      const accessToken = req.get('Authorization');
+      const userId = req.params.userId;
+      const page = req.params.page;
+
+      getPaginatedDocuments(accessToken, userId, page, WatchLater, pageSize)
+      .then((result) => {
+        if(typeof result === 'number') {
+          res.sendStatus(result);
+        } else {
+          res.json(result);
+        }
+      })
+    },
   }
 }
 
@@ -79,34 +122,40 @@ const getTime = function() {
 };
 
 const getAuthorizedUser = function(accessToken, userId) {
-  if(!!accessToken) {
-    return User.findOne({facebookId: userId})
-    .then((user) => {
-      if(!!user && user.accessToken.token == accessToken && user.accessToken.expiresAt > getTime()) {
-        //User is authenticated
-        return user;
-      } else {
-        return undefined;
-      }
-    });
-  }
+  return User.findOne({facebookId: userId})
+  .then((user) => {
+    if(!!user && user.accessToken.token == accessToken && user.accessToken.expiresAt > getTime()) {
+      //User is authenticated
+      return user;
+    } else {
+      return undefined;
+    }
+  });
 };
 
 //This should only be used with Favorite, Watched, WatchLater
 const addDocument = function(accessToken, userId, movieId, Model) {
   return getAuthorizedUser(accessToken, userId)
   .then((user) => {
-    //Check movie database to make sure movie exists
     if(!!user) {
-      var newDocument = new Model({
-        user: user._id,
-        movie: movieId,
-        key: user._id +'/'+ movieId,
-      });
+      //Check movie database to make sure movie exists
+      return Movie.findOne({tmdbId: movieId})
+      .then((movie) => {
+        if(!!movie) {
+          var newDocument = new Model({
+            _user: user._id,
+            _movie: movie._id,
+            tmdbId: movieId,
+            key: user._id +'/'+ movieId,
+          });
 
-      return newDocument.save()
-      .then((savedDocument) => {
-        return 200;
+          return newDocument.save()
+          .then((savedDocument) => {
+            return 200;
+          });
+        } else {
+          return 404;
+        }
       });
     } else {
       //Not authenticated properly
@@ -143,3 +192,40 @@ const deleteDocument = function(accessToken, userId, movieId, Model) {
     return 500;
   });
 };
+
+//This should only be used with Favorite, Watched, WatchLater
+const getPaginatedDocuments = function(accessToken, userId, page, Model, pageSize) {
+  page = parseInt(page);
+  return getAuthorizedUser(accessToken, userId)
+  .then((user) => {
+    if(!!user) {
+      if(page == NaN) {
+        return 400;
+      }
+
+      return Model.find({_user: user._id})
+      .skip(pageSize*(page-1))
+      .limit(pageSize)
+      .populate('_movie', 'data')
+      .then((array) => {
+        let response = {
+          page: page,
+          results: [],
+        };
+
+        array.forEach((movie) => {
+          response.results.push(movie._movie.data);
+        });
+
+        return response;
+      });
+    } else {
+      //Not authenticated properly
+      return 401;
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+    return 500;
+  });
+}

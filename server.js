@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import morgan     from 'morgan';
 import mongoose   from 'mongoose';
 import fetch      from 'node-fetch';
+import routes     from './routes';
 
 const PORT               = process.env.PORT || 3001;
 const TIMEOUT            = process.env.TIMEOUT || 3000;
@@ -13,6 +14,7 @@ const DB_URL             = process.env.DB_URL;
 const TMDB_URL           = process.env.TMDB_URL;
 const TMDB_KEY           = process.env.TMDB_KEY;
 const FACEBOOK_APP_TOKEN = process.env.FACEBOOK_APP_TOKEN;
+const PAGE_SIZE          = process.env.PAGE_SIZE || 20;
 
 let tmdbImageURL = 'http://image.tmdb.org/t/p/'; //Should be getting this on start and every few days
 
@@ -30,11 +32,10 @@ app.use(bodyParser.json());
 //Use morgan to log
 app.use(morgan('dev'));
 
-//Import Routes
-import routes from './routes';
+//Initiate Routes
 const tmdbRoutes = routes.tmdb(TMDB_URL, TMDB_KEY, TIMEOUT);
 const authRoutes = routes.auth(FACEBOOK_APP_TOKEN, TIMEOUT);
-const userRoutes = routes.user();
+const userRoutes = routes.user(PAGE_SIZE);
 
 //API Routes
 app.get('/', function(req, res) {
@@ -47,13 +48,13 @@ app.get('/api/login', authRoutes.login);
 //User routes
 app.post('/api/user/:userId/favorite/:movieId', userRoutes.postFavorite);
 app.delete('/api/user/:userId/favorite/:movieId', userRoutes.deleteFavorite);
-//app.get('/api/user/:userId/favorite', userRoutes.getFavorites);
+app.get('/api/user/:userId/favorite/:page', userRoutes.getFavorite);
 app.post('/api/user/:userId/watched/:movieId', userRoutes.postWatched);
 app.delete('/api/user/:userId/watched/:movieId', userRoutes.deleteWatched);
-//app.get('/api/user/:userId/watched', userRoutes.getWatched);
+app.get('/api/user/:userId/watched/:page', userRoutes.getWatched);
 app.post('/api/user/:userId/watchlater/:movieId', userRoutes.postWatchLater);
 app.delete('/api/user/:userId/watchlater/:movieId', userRoutes.deleteWatchLater);
-//app.get('/api/user/:userId/watchLater', userRoutes.getWatchLater);
+app.get('/api/user/:userId/watchLater/:page', userRoutes.getWatchLater);
 
 //Movie routes
 app.get('/api/movie/:movieId', tmdbRoutes.getMovieInfo);

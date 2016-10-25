@@ -3,8 +3,9 @@ const Schema   = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const WatchedSchema = Schema({
-  user: {type: ObjectId, require: true, ref: 'User'},
-  movie: {type: String, require: true},
+  _user: {type: ObjectId, require: true, ref: 'User'},
+  _movie: {type: ObjectId, require: true, ref: 'Movie'},
+  tmdbId: {type: String, require: true},
   key: {type: String, require: true, unique: true},
 });
 

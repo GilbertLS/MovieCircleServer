@@ -105,7 +105,7 @@ export default function(tmdbURL, tmdbKey, timeout) {
       Movie.findOne({tmdbId: movieId})
       .then((movie) => {
         if(!!movie) {
-          //We should be updating movies that haven't updated in the past day
+          //Fix: We should be updating movies that haven't updated in the past day
           res.json(movie.data);
         } else {
           //Get movie from tmdb, save it to db, and send it to user
