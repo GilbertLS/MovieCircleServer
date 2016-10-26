@@ -7,6 +7,7 @@ import morgan     from 'morgan';
 import mongoose   from 'mongoose';
 import fetch      from 'node-fetch';
 import routes     from './routes';
+const Promise = global.Promise;
 
 const PORT               = process.env.PORT || 3001;
 const TIMEOUT            = process.env.TIMEOUT || 3000;
@@ -22,7 +23,7 @@ const app = express();
 app.use(cors());
 
 //Connect to database
-mongoose.Promise = global.Promise;
+mongoose.Promise = Promise;
 mongoose.connect(DB_URL);
 
 //Use body parser so we can get info from POST and/or URL parameters
@@ -58,6 +59,7 @@ app.get('/api/user/:userId/watchLater/:page', userRoutes.getWatchLater);
 
 //Movie routes
 app.get('/api/movie/:movieId', tmdbRoutes.getMovieInfo);
+app.get('/api/movie/:movieId/user/:userId', tmdbRoutes.getAuthMovieInfo);
 app.get('/api/movie/popular/:page', tmdbRoutes.getPopular);
 app.get('/api/movie/top_rated/:page', tmdbRoutes.getTopRated);
 app.get('/api/movie/now_playing/:page', tmdbRoutes.getNowPlaying);

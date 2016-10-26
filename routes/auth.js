@@ -23,7 +23,6 @@ export default function(facebookAppToken, timeout) {
         }
       })
       .then((response) => {
-        console.log('Facebook Debug', response);
         if(response.data && response.data.is_valid) {
           login(response.data, accessToken, res);
         } else {
@@ -41,7 +40,7 @@ function login(facebookData, accessToken, res) {
   User.findOne({facebookId: facebookData.user_id}, (err, user) => {
     if(err) return console.error(err);
 
-    if(user == null) {
+    if(!user) {
       //Cannot find user, create a new one
       createUser(facebookData, accessToken)
       .then((newUser) => {

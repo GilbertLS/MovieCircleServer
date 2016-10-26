@@ -1,11 +1,17 @@
 import fetch from 'node-fetch';
+
 import {
   User,
   Favorite,
   Watched,
   WatchLater,
   Movie,
-}  from '../models'
+}  from '../models';
+
+import {
+  getTime,
+  getAuthenticatedUser,
+} from '../utility';
 
 const MONGO_DUPLICATE = 11000;
 
@@ -116,26 +122,9 @@ export default function(pageSize) {
   }
 }
 
-const getTime = function() {
-  const d = new Date();
-  return Math.floor(d.getTime()/1000);
-};
-
-const getAuthorizedUser = function(accessToken, userId) {
-  return User.findOne({facebookId: userId})
-  .then((user) => {
-    if(!!user && user.accessToken.token == accessToken && user.accessToken.expiresAt > getTime()) {
-      //User is authenticated
-      return user;
-    } else {
-      return undefined;
-    }
-  });
-};
-
 //This should only be used with Favorite, Watched, WatchLater
 const addDocument = function(accessToken, userId, movieId, Model) {
-  return getAuthorizedUser(accessToken, userId)
+  return getAuthenticatedUser(accessToken, userId)
   .then((user) => {
     if(!!user) {
       //Check movie database to make sure movie exists
@@ -175,7 +164,7 @@ const addDocument = function(accessToken, userId, movieId, Model) {
 
 //This should only be used with Favorite, Watched, WatchLater
 const deleteDocument = function(accessToken, userId, movieId, Model) {
-  return getAuthorizedUser(accessToken, userId)
+  return getAuthenticatedUser(accessToken, userId)
   .then((user) => {
     if(!!user) {
       return Model.findOne({key: user._id +'/'+ movieId}).remove()
@@ -196,7 +185,7 @@ const deleteDocument = function(accessToken, userId, movieId, Model) {
 //This should only be used with Favorite, Watched, WatchLater
 const getPaginatedDocuments = function(accessToken, userId, page, Model, pageSize) {
   page = parseInt(page);
-  return getAuthorizedUser(accessToken, userId)
+  return getAuthenticatedUser(accessToken, userId)
   .then((user) => {
     if(!!user) {
       if(page == NaN) {
