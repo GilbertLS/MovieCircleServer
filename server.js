@@ -10,7 +10,7 @@ import routes     from './routes';
 const Promise = global.Promise;
 
 const PORT               = process.env.PORT || 3001;
-const TIMEOUT            = process.env.TIMEOUT || 3000;
+const TIMEOUT            = process.env.TIMEOUT || 10000;
 const DB_URL             = process.env.DB_URL;
 const TMDB_URL           = process.env.TMDB_URL;
 const TMDB_KEY           = process.env.TMDB_KEY;

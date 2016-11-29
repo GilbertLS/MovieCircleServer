@@ -193,6 +193,7 @@ const getPaginatedDocuments = function(accessToken, userId, page, Model, pageSiz
       }
 
       return Model.find({_user: user._id})
+      .sort({$natural:-1})
       .skip(pageSize*(page-1))
       .limit(pageSize)
       .populate('_movie', 'data')
