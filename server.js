@@ -1,12 +1,13 @@
 require('dotenv').config();
 
-import express    from 'express';
-import cors       from 'cors';
-import bodyParser from 'body-parser';
-import morgan     from 'morgan';
-import mongoose   from 'mongoose';
-import fetch      from 'node-fetch';
-import routes     from './routes';
+import express     from 'express';
+import compression from 'compression';
+import cors        from 'cors';
+import bodyParser  from 'body-parser';
+import morgan      from 'morgan';
+import mongoose    from 'mongoose';
+import fetch       from 'node-fetch';
+import routes      from './routes';
 const Promise = global.Promise;
 
 const PORT               = process.env.PORT || 3001;
@@ -16,11 +17,13 @@ const TMDB_URL           = process.env.TMDB_URL;
 const TMDB_KEY           = process.env.TMDB_KEY;
 const FACEBOOK_APP_TOKEN = process.env.FACEBOOK_APP_TOKEN;
 const PAGE_SIZE          = process.env.PAGE_SIZE || 20;
+const PRODUCTION          = process.env.PRODUCTION || true;
 
 let tmdbImageURL = 'http://image.tmdb.org/t/p/'; //Should be getting this on start and every few days
 
 const app = express();
 app.use(cors());
+app.use(compression);
 
 //Connect to database
 mongoose.Promise = Promise;
@@ -31,7 +34,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Use morgan to log
-app.use(morgan('dev'));
+if(!PRODUCTION)
+  app.use(morgan('dev'));
 
 //Initiate Routes
 const tmdbRoutes = routes.tmdb(TMDB_URL, TMDB_KEY, TIMEOUT);
@@ -39,9 +43,7 @@ const authRoutes = routes.auth(FACEBOOK_APP_TOKEN, TIMEOUT);
 const userRoutes = routes.user(PAGE_SIZE);
 
 //API Routes
-app.get('/', function(req, res) {
-  res.send('MovieCircle API');
-});
+app.use(express.static(__dirname + '/public'));
 
 //Auth routes
 app.get('/api/login', authRoutes.login);
