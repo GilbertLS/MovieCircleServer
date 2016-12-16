@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 import express     from 'express';
-import compression from 'compression';
 import cors        from 'cors';
 import bodyParser  from 'body-parser';
 import morgan      from 'morgan';
@@ -23,7 +22,6 @@ let tmdbImageURL = 'http://image.tmdb.org/t/p/'; //Should be getting this on sta
 
 const app = express();
 app.use(cors());
-app.use(compression);
 
 //Connect to database
 mongoose.Promise = Promise;
