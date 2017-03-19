@@ -5,6 +5,6 @@ Server component of my movie tracking application created for an undergrad proje
 ![alt text](http://i.imgur.com/K9Vq3wF.jpg)
 
 
-UI can be found [here](https://github.com/GilbertLS/MovieCircle)
+Frontend can be found [here](https://github.com/GilbertLS/MovieCircle)
 
 Project is live [here](https://moviecircle.gilbertls.com/)
