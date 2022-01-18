@@ -6,5 +6,3 @@ Server component of my movie tracking application created for an undergrad proje
 
 
 Frontend can be found [here](https://github.com/GilbertLS/MovieCircle)
-
-Project is live [here](https://moviecircle.gilbertls.com/)
